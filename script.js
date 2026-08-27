@@ -120,26 +120,27 @@ const universes = {
     }
 };
 
-// 3. Логика запроса постеров (TMDB)
+// 3. Логика запроса постеров (TMDB через Bearer Token)
 async function getPosterUrl(title) {
-    const TMDB_API_KEY = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkNjA5Y2I4MzI1OGRmOGIyYjdlOWFlZTIwOGQ2ZTBhMyIsIm5iZiI6MTc4Nzg1NDk5Ny44OTIsInN1YiI6IjZhOTA4MDk1Zjg5ZDNmNTJhY2EyMzg1ZiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.95Vug9tu0lavpN5KsvRNIgGoK6sUQ4nKdZoO-XuqPz4'; // Вставь свой рабочий ключ сюда
+    const TMDB_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkNjA5Y2I4MzI1OGRmOGIyYjdlOWFlZTIwOGQ2ZTBhMyIsIm5iZiI6MTc4Nzg1NDk5Ny44OTIsInN1YiI6IjZhOTA4MDk1Zjg5ZDNmNTJhY2EyMzg1ZiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.95Vug9tu0lavpN5KsvRNIgGoK6sUQ4nKdZoO-XuqPz4';
     
-    if (TMDB_API_KEY) {
-        try {
-            let res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(title)}&language=ru-RU`);
-            let data = await res.json();
-            
-            // Проверяем, нашёл ли TMDB фильм и есть ли у него картинка
-            if (data.results && data.results.length > 0 && data.results[0].poster_path) {
-                // w300 — это размер картинки (ширина 300px), чтобы качество не мылило
-                return `https://image.tmdb.org/t/p/w300${data.results[0].poster_path}`;
+    try {
+        let res = await fetch(`https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(title)}&language=ru-RU`, {
+            headers: {
+                'Authorization': `Bearer ${TMDB_TOKEN}`,
+                'accept': 'application/json'
             }
-        } catch (e) {
-            console.error("Ошибка парсинга TMDB. Проверь VPN/Прокси:", e);
+        });
+        let data = await res.json();
+        
+        if (data.results && data.results.length > 0 && data.results[0].poster_path) {
+            return `https://image.tmdb.org/t/p/w300${data.results[0].poster_path}`;
         }
+    } catch (e) {
+        console.error("Ошибка парсинга TMDB (проверь VPN/Прокси):", e);
     }
     
-    // Заглушка, если API не ответил, заблокирован или фильм не найден
+    // Заглушка, если ничего не найдено или нет сети
     return `https://placehold.co/160x240/161b22/e23636?text=${encodeURIComponent(title.substring(0, 3))}`;
 }
 

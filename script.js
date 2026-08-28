@@ -120,29 +120,32 @@ const universes = {
     }
 };
 
-// 3. Логика запроса постеров (TMDB через Bearer Token)
+// 3. Логика запроса постеров
 async function getPosterUrl(title) {
-    const TMDB_TOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJkNjA5Y2I4MzI1OGRmOGIyYjdlOWFlZTIwOGQ2ZTBhMyIsIm5iZiI6MTc4Nzg1NDk5Ny44OTIsInN1YiI6IjZhOTA4MDk1Zjg5ZDNmNTJhY2EyMzg1ZiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.95Vug9tu0lavpN5KsvRNIgGoK6sUQ4nKdZoO-XuqPz4';
+    const KINOPOISK_API_KEY = ''; // Вставь токен сюда, когда получишь
     
-    try {
-        let res = await fetch(`https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(title)}&language=ru-RU`, {
-            headers: {
-                'Authorization': `Bearer ${TMDB_TOKEN}`,
-                'accept': 'application/json'
+    if (KINOPOISK_API_KEY) {
+        try {
+            let res = await fetch(`https://api.kinopoisk.dev/v1.4/movie/search?page=1&limit=1&query=${encodeURIComponent(title)}`, {
+                headers: {
+                    'X-API-KEY': KINOPOISK_API_KEY,
+                    'Accept': 'application/json'
+                }
+            });
+            let data = await res.json();
+            if (data.docs && data.docs.length > 0 && data.docs[0].poster && data.docs[0].poster.url) {
+                return data.docs[0].poster.previewUrl || data.docs[0].poster.url;
             }
-        });
-        let data = await res.json();
-        
-        if (data.results && data.results.length > 0 && data.results[0].poster_path) {
-            return `https://image.tmdb.org/t/p/w300${data.results[0].poster_path}`;
+        } catch (e) {
+            console.error("Ошибка парсинга Кинопоиска:", e);
         }
-    } catch (e) {
-        console.error("Ошибка парсинга TMDB (проверь VPN/Прокси):", e);
     }
-    
-    // Заглушка, если ничего не найдено или нет сети
-    return `https://placehold.co/160x240/161b22/e23636?text=${encodeURIComponent(title.substring(0, 3))}`;
+    // Крутая заглушка
+    return `https://placehold.co/120x180/1a1a1a/e23636?text=${encodeURIComponent(title.substring(0, 3))}`;
 }
+
+const tabsContainer = document.getElementById('tabs-container');
+const moviesContainer = document.getElementById('movies-container');
 
 // 4. Отрисовка
 async function renderUniverse(earthId) {

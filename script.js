@@ -275,7 +275,7 @@ async function renderUniverse(earthId) {
         const tmdbData = await getTMDBData(movie.title, movie.year, movie.type);
         const isWatched = watchedMovies.includes(movie.title);
         const watchedClass = isWatched ? 'watched' : '';
-        const btnText = isWatched ? '✓ Просмотрено' : 'Не смотрел';
+        const btnText = isWatched ? '✓ Просмотрено' : 'Не просмотрено';
 
         const badgeHtml = movie.optional ? `<div class="optional-badge">Необязательно</div>` : '';
 
@@ -344,7 +344,7 @@ moviesContainer.addEventListener('click', (e) => {
         
         if (watchedMovies.includes(title)) {
             watchedMovies = watchedMovies.filter(m => m !== title);
-            e.target.textContent = "Не смотрел";
+            e.target.textContent = "Не просмотрено";
             card.classList.remove('watched');
         } else {
             watchedMovies.push(title);

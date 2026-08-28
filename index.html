@@ -7,19 +7,42 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
+    <header class="main-header">
         <h1>Мультивселенная Marvel</h1>
         <p>Выбери свою Землю и отмечай просмотренное</p>
     </header>
 
-    <div class="tabs" id="tabs-container">
-        <!-- Кнопки сгенерируются сюда -->
+    <!-- Липкая шапка с навигацией и фильтром -->
+    <div class="sticky-header">
+        <div class="tabs" id="tabs-container"></div>
+        <div class="toggle-container">
+            <label class="switch">
+                <input type="checkbox" id="optional-toggle">
+                <span class="slider"></span>
+            </label>
+            <span class="toggle-label">Показать необязательные проекты</span>
+        </div>
     </div>
 
-    <div id="movies-container" class="roadmap">
-        <!-- Карточки фильмов сгенерируются сюда -->
-    </div>
+    <!-- Основной лэйаут: сайдбар + таймлайн -->
+    <div class="layout-wrapper">
+        <nav class="sidebar" id="sidebar">
+            <!-- Ссылки на фазы сгенерируются сюда -->
+        </nav>
 
+        <main id="movies-container" class="roadmap">
+            <!-- Карточки фильмов сгенерируются сюда -->
+        </main>
+    </div>
+<!-- Модальное окно для сюжета -->
+    <div id="summary-modal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-btn" id="close-modal">&times;</span>
+            <h2 id="modal-title">Название</h2>
+            <div class="modal-body" id="modal-text">Сюжет загружается...</div>
+        </div>
+    </div>
     <script src="script.js"></script>
+    <script src="lore.js"></script>
 </body>
 </html>

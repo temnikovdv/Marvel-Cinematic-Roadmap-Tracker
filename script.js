@@ -402,4 +402,32 @@ window.addEventListener('click', (e) => {
     }
 });
 
+// Логика мобильного кебаб-меню
+const kebabBtn = document.getElementById('kebab-btn');
+const headerControls = document.getElementById('header-controls');
+
+if (kebabBtn && headerControls) {
+    // Открытие/закрытие по клику на три точки
+    kebabBtn.addEventListener('click', () => {
+        headerControls.classList.toggle('active');
+        kebabBtn.classList.toggle('active');
+    });
+
+    // Автоматически прячем меню, когда выбрали новую вселенную
+    document.getElementById('tabs-container').addEventListener('click', (e) => {
+        if (e.target.classList.contains('tab-btn')) {
+            headerControls.classList.remove('active');
+            kebabBtn.classList.remove('active');
+        }
+    });
+}
+
+
+
+
+
+
+
+
+
 initTabs();

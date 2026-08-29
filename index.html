@@ -12,15 +12,25 @@
         <p>Выбери свою Землю и отмечай просмотренное</p>
     </header>
 
-    <!-- Липкая шапка с навигацией и фильтром -->
+    <!-- Липкая шапка -->
     <div class="sticky-header">
-        <div class="tabs" id="tabs-container"></div>
-        <div class="toggle-container">
-            <label class="switch">
-                <input type="checkbox" id="optional-toggle">
-                <span class="slider"></span>
-            </label>
-            <span class="toggle-label">Показать необязательные проекты</span>
+        <!-- Полоска для мобилок (на ПК скрыта) -->
+        <div class="mobile-header-bar">
+            <span class="current-universe-label">Настройки вселенной</span>
+            <button id="kebab-btn" class="kebab-btn">&#8942;</button>
+        </div>
+        
+        <!-- Контейнер с табами и тумблером (на мобилках это выпадающее меню) -->
+        <div id="header-controls" class="header-controls">
+            <div class="tabs" id="tabs-container"></div>
+            
+            <div class="toggle-container">
+                <span>Показать необязательные</span>
+                <label class="switch">
+                    <input type="checkbox" id="optional-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
         </div>
     </div>
 

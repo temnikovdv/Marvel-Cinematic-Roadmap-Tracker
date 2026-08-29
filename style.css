@@ -260,9 +260,17 @@ input:checked + .slider:before {
     border-color: var(--text-muted);
 }
 
+/* Удерживаем кружок на центральной линии (компенсируем сдвиг карточки на 5px) */
 .movie-card:hover::before {
+    transform: translateX(-5px); 
     background: var(--marvel-red);
     box-shadow: 0 0 10px var(--marvel-red);
+}
+
+/* Растягиваем линию вслед за уехавшей карточкой */
+.movie-card:hover::after {
+    width: 23px; 
+    transform: translateX(-5px);
 }
 
 .poster {

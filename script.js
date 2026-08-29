@@ -254,16 +254,29 @@ async function renderUniverse(earthId) {
     const activeTab = document.getElementById(`tab-${earthId}`);
     if (activeTab) activeTab.classList.add('active');
 
-    moviesContainer.innerHTML = '<p style="text-align:center; font-size:1.2em; color:#a0a0a0;">Подключение к мультивселенной...</p>';
+    moviesContainer.innerHTML = '<p style="text-align:center; font-size:1.2em; color:#a0a0a0;">Подключение к мультивселенной (Загрузка данных)...</p>';
     sidebar.innerHTML = '';
     
     const universe = universes[earthId];
+    
+    // 1. Сначала отфильтруем то, что нужно показывать (убираем необязательные, если тумблер выключен)
+    const visibleMovies = universe.movies.filter(movie => !movie.optional || showOptional);
+
+    // 2. ЗАПУСКАЕМ ВСЕ ЗАПРОСЫ К TMDB ОДНОВРЕМЕННО (Параллельно)
+    // Это ускорит загрузку страницы раз в 10-20
+    const moviesWithData = await Promise.all(visibleMovies.map(async (movie) => {
+        const tmdbData = await getTMDBData(movie.title, movie.year, movie.type);
+        return { movie, tmdbData };
+    }));
+
+    // 3. Теперь, когда все данные получены мгновенно, собираем HTML
     let html = '';
     let sidebarHtml = '';
     let currentPhase = '';
 
-    for (let movie of universe.movies) {
-        if (movie.optional && !showOptional) continue;
+    for (let item of moviesWithData) {
+        const movie = item.movie;
+        const tmdbData = item.tmdbData;
 
         if (movie.phase !== currentPhase) {
             const phaseId = `phase-${movie.phase.replace(/\s+/g, '-').toLowerCase()}`;
@@ -272,10 +285,9 @@ async function renderUniverse(earthId) {
             currentPhase = movie.phase;
         }
 
-        const tmdbData = await getTMDBData(movie.title, movie.year, movie.type);
         const isWatched = watchedMovies.includes(movie.title);
         const watchedClass = isWatched ? 'watched' : '';
-        const btnText = isWatched ? '✓ Просмотрено' : 'Не просмотрено';
+        const btnText = isWatched ? '✓ Просмотрено' : 'Не смотрел';
 
         const badgeHtml = movie.optional ? `<div class="optional-badge">Необязательно</div>` : '';
 
@@ -293,7 +305,7 @@ async function renderUniverse(earthId) {
         html += `
             <div class="movie-card ${watchedClass}">
                 <div class="poster">
-                    <!-- Защита от черных квадратов: если прокси упал, грузим SVG заглушку -->
+                    <!-- Защита от черных квадратов -->
                     <img src="${tmdbData.poster}" alt="Постер" onerror="this.onerror=null; this.src='${tmdbData.fallback}';">
                 </div>
                 <div class="info">
@@ -303,7 +315,6 @@ async function renderUniverse(earthId) {
                     
                     <div class="buttons-row">
                         <button class="watch-btn" data-title="${safeTitle}">${btnText}</button>
-                        <!-- Две разные кнопки с разными данными (data-text) и заголовками (data-header) -->
                         <button class="skip-btn" data-title="${safeTitle}" data-header="СЮЖЕТ" data-text="${safePlot}">Сюжет</button>
                         <button class="lore-btn" data-title="${safeTitle}" data-header="БАЗА Щ.И.Т." data-text="${safeLore}">Спойлеры</button>
                     </div>

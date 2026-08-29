@@ -254,22 +254,30 @@ async function renderUniverse(earthId) {
     const activeTab = document.getElementById(`tab-${earthId}`);
     if (activeTab) activeTab.classList.add('active');
 
-    moviesContainer.innerHTML = '<p style="text-align:center; font-size:1.2em; color:#a0a0a0;">Подключение к мультивселенной (Загрузка данных)...</p>';
+    moviesContainer.innerHTML = '<p style="text-align:center; font-size:1.2em; color:#a0a0a0;">Обход защиты серверов (загрузка архивов)...</p>';
     sidebar.innerHTML = '';
     
     const universe = universes[earthId];
     
-    // 1. Сначала отфильтруем то, что нужно показывать (убираем необязательные, если тумблер выключен)
     const visibleMovies = universe.movies.filter(movie => !movie.optional || showOptional);
 
-    // 2. ЗАПУСКАЕМ ВСЕ ЗАПРОСЫ К TMDB ОДНОВРЕМЕННО (Параллельно)
-    // Это ускорит загрузку страницы раз в 10-20
-    const moviesWithData = await Promise.all(visibleMovies.map(async (movie) => {
-        const tmdbData = await getTMDBData(movie.title, movie.year, movie.type);
-        return { movie, tmdbData };
-    }));
+    // УМНАЯ ЗАГРУЗКА ПАЧКАМИ
+    // Грузим по 5 штук за раз, чтобы не словить бан от TMDB за спам запросами
+    const chunkSize = 5;
+    let moviesWithData = [];
+    
+    for (let i = 0; i < visibleMovies.length; i += chunkSize) {
+        const chunk = visibleMovies.slice(i, i + chunkSize);
+        
+        // Ждем выполнения текущей пачки из 5 запросов
+        const chunkResults = await Promise.all(chunk.map(async (movie) => {
+            const tmdbData = await getTMDBData(movie.title, movie.year, movie.type);
+            return { movie, tmdbData };
+        }));
+        
+        moviesWithData.push(...chunkResults);
+    }
 
-    // 3. Теперь, когда все данные получены мгновенно, собираем HTML
     let html = '';
     let sidebarHtml = '';
     let currentPhase = '';
@@ -291,10 +299,8 @@ async function renderUniverse(earthId) {
 
         const badgeHtml = movie.optional ? `<div class="optional-badge">Необязательно</div>` : '';
 
-        // Подготавливаем безопасный сюжет от TMDB
         const safePlot = tmdbData.plot.replace(/"/g, '&quot;').replace(/\n/g, '<br>');
         
-        // Подготавливаем спойлеры (лор)
         const spoilerText = (typeof mcuLore !== 'undefined' && mcuLore[movie.title]) 
             ? mcuLore[movie.title] 
             : "⚠️ Уровень допуска недостаточен. Секретные архивы и влияние на КВМ для этого проекта еще не задокументированы.";
@@ -305,7 +311,6 @@ async function renderUniverse(earthId) {
         html += `
             <div class="movie-card ${watchedClass}">
                 <div class="poster">
-                    <!-- Защита от черных квадратов -->
                     <img src="${tmdbData.poster}" alt="Постер" onerror="this.onerror=null; this.src='${tmdbData.fallback}';">
                 </div>
                 <div class="info">

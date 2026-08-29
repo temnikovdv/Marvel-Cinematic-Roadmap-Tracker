@@ -49,12 +49,19 @@ h1 span {
     background: rgba(13, 17, 23, 0.95);
     backdrop-filter: blur(10px);
     z-index: 100;
-    padding: 20px 0;
     border-bottom: 1px solid var(--line-color);
+}
+
+.mobile-header-bar {
+    display: none; /* Скрываем на десктопе */
+}
+
+.header-controls {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 15px;
+    padding: 20px 0;
 }
 
 /* Табы */
@@ -454,4 +461,233 @@ input:checked + .slider:before {
 
 .close-btn:hover {
     color: #fff;
+}
+
+/* =========================================
+   АДАПТАЦИЯ ПОД МОБИЛЬНЫЕ УСТРОЙСТВА (СМАРТФОНЫ)
+   ========================================= */
+@media (max-width: 768px) {
+    /* Главный лэйаут: убираем сайдбар наверх */
+    .layout-wrapper {
+        flex-direction: column;
+        margin: 20px auto;
+        gap: 20px;
+        padding: 0 10px;
+    }
+
+    /* Сайдбар превращается в горизонтальную свайп-ленту */
+    .sidebar {
+        position: static; 
+        width: 100%;
+        flex-direction: row;
+        overflow-x: auto;
+        padding-bottom: 5px;
+        gap: 8px;
+        /* Прячем скроллбар для красоты (Chrome/Safari/Firefox) */
+        scrollbar-width: none;
+    }
+    .sidebar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .sidebar-link {
+        white-space: nowrap;
+        border-left: none;
+        border-bottom: 3px solid transparent;
+        border-radius: 0;
+        padding: 8px 12px;
+        font-size: 0.85em;
+    }
+
+    .sidebar-link:hover {
+        border-left-color: transparent;
+        border-bottom-color: var(--marvel-red);
+        background: transparent;
+    }
+
+    /* Таймлайн сдвигаем левее */
+    .roadmap {
+        padding-left: 25px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .roadmap::before {
+        left: 5px;
+    }
+
+    .phase-title {
+        font-size: 1em;
+        margin: 20px 0 15px -25px;
+        padding: 4px 12px;
+    }
+
+    /* Уплотняем карточки */
+    .movie-card {
+        margin-bottom: 20px;
+    }
+
+    /* Отключаем уезжание карточки на тачскринах, чтобы не бесило */
+    .movie-card:hover {
+        transform: none;
+    }
+
+    /* Выравниваем кружки таймлайна */
+    .movie-card::before {
+        left: -26px;
+        top: 25px;
+        width: 10px;
+        height: 10px;
+        border-width: 2px;
+    }
+    
+    .movie-card:hover::before {
+        transform: none; /* Точка больше не компенсирует сдвиг */
+    }
+
+    /* Прячем горизонтальную линию-соединитель (на мобилках тесно) */
+    .movie-card::after, .movie-card:hover::after {
+        display: none; 
+    }
+
+    /* Уменьшаем постер */
+    .poster {
+        width: 110px;
+        min-height: 160px;
+    }
+
+    /* Ужимаем инфо-блок */
+    .info {
+        padding: 12px;
+    }
+
+    .title {
+        font-size: 1.1em;
+        margin-bottom: 4px;
+    }
+
+    .year {
+        font-size: 0.9em;
+    }
+
+    /* Кнопки перестраиваем в компактную сетку */
+    .buttons-row {
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 10px;
+    }
+
+    .watch-btn, .skip-btn, .lore-btn {
+        font-size: 0.7em;
+        padding: 0 6px;
+        height: 36px;
+        flex-grow: 1; /* Растягиваем кнопки, чтобы заполняли пустоты */
+    }
+
+    /* Уменьшаем шрифты в шапке */
+    .main-header {
+        padding: 20px 10px 10px;
+    }
+    
+    h1 {
+        font-size: 1.4em;
+    }
+    
+    .main-header p {
+        font-size: 0.9em;
+    }
+
+    .tab-btn {
+        font-size: 0.75em;
+        padding: 6px 12px;
+    }
+    
+    .toggle-label {
+        font-size: 0.85em;
+    }
+
+    /* Ужимаем модальное окно */
+    .modal-content {
+        padding: 20px;
+        width: 95%;
+        margin: 10px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .modal-content h2 {
+        font-size: 1.1em;
+        padding-right: 20px; /* Чтобы крестик не перекрывал текст */
+    }
+    
+    .modal-body {
+        font-size: 0.95em;
+    }
+    
+    .close-btn {
+        top: 10px;
+        right: 15px;
+    }
+
+    /* --- КЕБАБ МЕНЮ ДЛЯ МОБИЛОК --- */
+    .mobile-header-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 20px;
+    }
+
+    .current-universe-label {
+        font-weight: 800;
+        color: var(--text-main);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.9em;
+    }
+
+    .kebab-btn {
+        background: transparent;
+        border: none;
+        color: var(--text-muted);
+        font-size: 26px;
+        cursor: pointer;
+        padding: 0 10px;
+        line-height: 1;
+        margin-right: -10px; /* Компенсация отступа для удобного тапа */
+        transition: color 0.2s;
+    }
+
+    .kebab-btn:hover, .kebab-btn.active {
+        color: var(--marvel-red);
+    }
+
+    .header-controls {
+        display: none; /* Прячем меню по умолчанию */
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: rgba(13, 17, 23, 0.98);
+        border-bottom: 1px solid var(--line-color);
+        padding: 20px;
+        box-sizing: border-box;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        gap: 20px;
+    }
+
+    .header-controls.active {
+        display: flex; /* Показываем при нажатии на кебаб */
+    }
+
+    /* Табы в мобильном меню выстраиваем столбиком */
+    .tabs {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .tab-btn {
+        width: 100%;
+        padding: 14px;
+        font-size: 1.05em;
+    }
 }
